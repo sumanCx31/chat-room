@@ -12,7 +12,10 @@ export const getChats = async (token: string) => {
   return res.data;
 };
 
-export const getMessages = async (chatId: string, token: string) => {
+export const getMessages = async (
+  chatId: string,
+  token: string
+) => {
   const res = await axios.get(`${API}/message/${chatId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -30,6 +33,23 @@ export const sendMessageApi = async (
   const res = await axios.post(
     `${API}/message`,
     { chatId, content },
+    {
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
+    }
+  );
+
+  return res.data;
+};
+
+export const accessChat = async (
+  userId: string,
+  token: string
+) => {
+  const res = await axios.post(
+    `${API}/chat`,
+    { userId },
     {
       headers: {
         Authorization: `Bearer ${token}`,
