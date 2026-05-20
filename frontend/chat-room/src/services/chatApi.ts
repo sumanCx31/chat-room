@@ -7,20 +7,27 @@ export const getChats = async (token: string) => {
     },
   });
 
-  return res.json();
+  const json = await res.json();
+
+  return json.data;
 };
 
 export const getMessages = async (
   chatId: string,
   token: string
 ) => {
-  const res = await fetch(`${BASE_URL}/chat/${chatId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await fetch(
+    `${BASE_URL}/chat/${chatId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
-  return res.json();
+  const json = await res.json();
+
+  return json.data;
 };
 
 export const sendMessageApi = async (
@@ -28,19 +35,24 @@ export const sendMessageApi = async (
   content: string,
   token: string
 ) => {
-  const res = await fetch(`${BASE_URL}/chat/message`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      chatId,
-      content,
-    }),
-  });
+  const res = await fetch(
+    `${BASE_URL}/chat/message`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        chatId,
+        content,
+      }),
+    }
+  );
 
-  return res.json();
+  const json = await res.json();
+
+  return json.data;
 };
 
 export const accessChat = async (
@@ -58,5 +70,7 @@ export const accessChat = async (
     }),
   });
 
-  return res.json();
+  const json = await res.json();
+
+  return json.data;
 };
