@@ -8,7 +8,7 @@ router.get("", (req ,res)=> {
 });
 
 router.use("/auth",authRouter);
-router.use('/chat',chatRouter);
+// router.use('/chat',chatRouter);
 router.use('/message',messageRouter);
 
 module.exports = router;

@@ -1,37 +1,36 @@
-const mongoose =  require("mongoose");
+const { required, date } = require("joi");
+const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
   {
-    sender: {
+    senderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
 
-    chat: {
+    receiverId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Chat",
+      ref: "User",
+      required: true,
     },
 
-    content: {
+    message: {
       type: String,
+      required: true,
+      maxlength: 1000,
       trim: true,
+      validate: [
+        {
+          validator: (value) => value.length > 0,
+          message: "message cannot be empty!",
+        },
+      ],
     },
-
-    messageType: {
-      type: String,
-      enum: ["text", "image"],
-      default: "text",
-    },
-
-    seenBy: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    // createdAt: { type: date, default: null },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const messageModel =  mongoose.model("Message", messageSchema);
+const messageModel = mongoose.model("Message", messageSchema);
 module.exports = messageModel;

@@ -34,9 +34,9 @@ export const sendMessageApi = async (
     `${API}/message`,
     { chatId, content },
     {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
 

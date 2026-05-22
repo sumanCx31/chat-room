@@ -4,7 +4,7 @@ const app = require("./src/config/express.config");
 
 const server = http.createServer(app);
 
-const PORT = 9001;
+const PORT = 9001 || 9006;
 
 // SOCKET SETUP
 const io = new Server(server, {
