@@ -5,13 +5,12 @@ type MessageProps = {
 };
 
 function Message({ message }: MessageProps) {
-  const currentUser = JSON.parse(
-    localStorage.getItem("user") || "{}"
-  );
+  const currentUser =
+    localStorage.getItem("senderId");
 
   const isSender =
-    message.senderId === currentUser._id ||
-    message.senderId?._id === currentUser._id;
+    currentUser === message.senderId ||
+    currentUser === message.sender?._id;
 
   return (
     <div

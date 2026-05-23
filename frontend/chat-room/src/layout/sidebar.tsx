@@ -4,6 +4,11 @@ type UserType = {
   _id: string;
   name: string;
   email: string;
+  image: {
+    publicId: string;
+    secureUrl: string;
+    optimizedUrl: string;
+  };
 };
 
 type SidebarProps = {
@@ -11,64 +16,47 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ users }: SidebarProps) => {
-  const {
-    selectedConversation,
-    setSelectedConversation,
-  }:any = useConversation();
+  const { selectedConversation, setSelectedConversation }: any =
+    useConversation();
+  // console.log(users);
 
   return (
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">
-
       <div className="h-16 border-b border-slate-800 flex items-center px-6">
-        <h1 className="text-xl font-bold">
-          Chats
-        </h1>
+        <h1 className="text-xl font-bold">Chats</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto">
-
         {users.map((user) => {
-
-          const isSelected =
-            selectedConversation?._id === user._id;
+          const isSelected = selectedConversation?._id === user._id;
 
           return (
             <div
               key={user._id}
-              onClick={() =>
-                setSelectedConversation(user)
-              }
+              onClick={() => setSelectedConversation(user)}
               className={`p-4 border-b border-slate-800 cursor-pointer transition ${
-                isSelected
-                  ? "bg-slate-800"
-                  : "hover:bg-slate-800/60"
+                isSelected ? "bg-slate-800" : "hover:bg-slate-800/60"
               }`}
             >
               <div className="flex items-center gap-3">
-
-                <div className="w-11 h-11 rounded-full bg-indigo-600 flex items-center justify-center font-semibold">
-                  {user.name
-                    .slice(0, 2)
-                    .toUpperCase()}
+                <div>
+                  <div className="avatar avatar-online size-15">
+                    <div className="w-24 rounded-full">
+                      <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
+                    </div>
+                  </div>
                 </div>
 
                 <div>
-                  <h2 className="font-semibold text-sm">
-                    {user.name}
-                  </h2>
+                  <h2 className="font-semibold text-sm">{user.name}</h2>
 
-                  <p className="text-xs text-slate-400">
-                    {user.email}
-                  </p>
+                  <p className="text-xs text-slate-400">{user.email}</p>
                 </div>
-
               </div>
             </div>
           );
         })}
-
       </div>
-
     </aside>
   );
 };

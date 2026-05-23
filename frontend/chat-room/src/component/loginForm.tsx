@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Mail, MessageSquare, ArrowRight, Loader2 } from "lucide-react";
 import authSvc from "../services/Auth.service";
+import { useNavigate } from "react-router";
 
 export default function ChatLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,11 +27,17 @@ export default function ChatLogin() {
         localStorage.setItem("token", res.token);
       }
 
+      if(res.data.userId){
+        localStorage.setItem("senderId",res.data.userId);
+      }
+
       if (res?.user) {
         localStorage.setItem("user", JSON.stringify(res.user));
       }
 
       console.log("Login success:", res);
+      navigate("/chat");
+
     } catch (error: any) {
       console.log("Login failed:", error?.message || error);
     } finally {

@@ -34,6 +34,7 @@ class AuthController {
       const {email,activationToken} = req.body;
       const user = await UserModel.findOne({email:email});
       
+      
       if(user.status === Status.ACTIVE){
         throw{
           code:400,
@@ -123,6 +124,7 @@ class AuthController {
 
       res.json({
         data: {
+          userId:user._id,
           accessToken: maskedAccessToken,
           refreshToken: maskedRefreshToken,
         },

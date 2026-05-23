@@ -58,14 +58,17 @@ class ChatController {
   // Get messages of a chat
   getMessages = async (req, res) => {
     try {
-      const { id: chatUser } = req.params;
+      const receiverId = req.params;
 
-      const { senderId } = "6a0889e1a09e5d310f995b5b";
+     const { senderId } = req.query;
+
+      console.log(receiverId,senderId);
+      
 
       const conversation = await chatModel
         .findOne({
           participants: {
-            $all: ["6a08899aa09e5d310f995b57", "6a08899aa09e5d310f995b57"],
+            $all: [senderId, receiverId],
           },
         })
         .populate("message");
