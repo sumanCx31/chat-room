@@ -1,3 +1,5 @@
+import useConversation from "../context/useConversation";
+
 type UserType = {
   _id: string;
   name: string;
@@ -6,15 +8,14 @@ type UserType = {
 
 type SidebarProps = {
   users: UserType[];
-  selectedUser: UserType | null;
-  onSelectUser: (user: UserType) => void;
 };
 
-const Sidebar = ({
-  users,
-  selectedUser,
-  onSelectUser,
-}: SidebarProps) => {
+const Sidebar = ({ users }: SidebarProps) => {
+  const {
+    selectedConversation,
+    setSelectedConversation,
+  }:any = useConversation();
+
   return (
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">
 
@@ -27,12 +28,16 @@ const Sidebar = ({
       <div className="flex-1 overflow-y-auto">
 
         {users.map((user) => {
-          const isSelected = selectedUser?._id === user._id;
+
+          const isSelected =
+            selectedConversation?._id === user._id;
 
           return (
             <div
               key={user._id}
-              onClick={() => onSelectUser(user)}
+              onClick={() =>
+                setSelectedConversation(user)
+              }
               className={`p-4 border-b border-slate-800 cursor-pointer transition ${
                 isSelected
                   ? "bg-slate-800"

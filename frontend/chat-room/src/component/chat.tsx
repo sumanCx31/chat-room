@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../layout/sidebar";
+import "./../assets/style/index.css";
+import Message from "./message";
+import useGetMessage from "../context/useGetMessage.ts";
+import useConversation from "../context/useConversation.ts";
 
 type UserType = {
   _id: string;
@@ -9,8 +13,10 @@ type UserType = {
 
 const Chat = () => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [selectedUser, setSelectedUser] =
-    useState<UserType | null>(null);
+
+  const { selectedConversation }: any = useConversation();
+
+  const { messages, loading } = useGetMessage();
 
   useEffect(() => {
     fetchUsers();
@@ -22,7 +28,6 @@ const Chat = () => {
         "http://localhost:9001/api/v1/auth/users"
       );
 
-
       const data = await res.json();
 
       setUsers(data?.data || []);
@@ -32,26 +37,25 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-screen flex bg-slate-950 text-white">
+    <div className="h-screen flex bg-slate-950 text-white overflow-hidden">
 
-      <Sidebar
-        users={users}
-        selectedUser={selectedUser}
-        onSelectUser={setSelectedUser}
-      />
+      {/* SIDEBAR */}
+      <Sidebar users={users} />
 
-      <main className="flex-1 flex flex-col">
+      {/* CHAT AREA */}
+      <main className="flex-1 flex flex-col h-screen">
 
-        <header className="h-16 border-b border-slate-800 flex items-center px-6 bg-slate-900">
+        {/* HEADER */}
+        <header className="h-16 border-b border-slate-800 flex items-center px-6 bg-slate-900 shrink-0">
 
-          {selectedUser ? (
+          {selectedConversation ? (
             <div>
               <h2 className="font-semibold text-lg">
-                {selectedUser.name}
+                {selectedConversation.name}
               </h2>
 
               <p className="text-xs text-slate-400">
-                {selectedUser.email}
+                {selectedConversation.email}
               </p>
             </div>
           ) : (
@@ -62,27 +66,44 @@ const Chat = () => {
 
         </header>
 
-        <div className="flex-1 flex items-center justify-center">
+        {/* BODY */}
+        {selectedConversation ? (
+          <>
+            {/* MESSAGES */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
 
-          {selectedUser ? (
-            <div className="text-center">
-
-              <div className="w-24 h-24 rounded-full bg-indigo-600 flex items-center justify-center text-3xl font-bold mx-auto mb-4">
-                {selectedUser.name
-                  .slice(0, 2)
-                  .toUpperCase()}
-              </div>
-
-              <h1 className="text-2xl font-bold">
-                {selectedUser.name}
-              </h1>
-
-              <p className="text-slate-400 mt-2">
-                {selectedUser.email}
-              </p>
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                messages?.map((msg: any) => (
+                  <Message key={msg._id} message={msg} />
+                ))
+              )}
 
             </div>
-          ) : (
+
+            {/* INPUT */}
+            <div className="p-4 border-t border-slate-800 bg-slate-900 shrink-0">
+
+              <div className="flex gap-3">
+
+                <input
+                  type="text"
+                  placeholder="Type message..."
+                  className="input input-bordered flex-1 bg-slate-800 border-slate-700"
+                />
+
+                <button className="btn btn-primary">
+                  Send
+                </button>
+
+              </div>
+
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+
             <div className="text-center">
 
               <h1 className="text-2xl font-bold text-slate-300">
@@ -94,9 +115,9 @@ const Chat = () => {
               </p>
 
             </div>
-          )}
 
-        </div>
+          </div>
+        )}
 
       </main>
     </div>
