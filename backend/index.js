@@ -1,7 +1,6 @@
 const http = require("http");
 const { Server } = require("socket.io");
 const app = require("./src/config/express.config");
-const cors = require("cors");
 
 const server = http.createServer(app);
 
@@ -12,10 +11,40 @@ const io = new Server(server, {
   },
 });
 
+// userId -> Set(socketIds) (supports multiple tabs)
+const users = new Map();
+
 io.on("connection", (socket) => {
-  console.log("New Client Connected:", socket.id);
+  const userId = socket.handshake.query.userId;
+
+  console.log("New Client Connected:", socket.id, "User:", userId);
+
+  if (!userId) return;
+
+  // init set
+  if (!users.has(userId)) {
+    users.set(userId, new Set());
+  }
+
+  users.get(userId).add(socket.id);
+
+  // emit online users
+  io.emit("getonline", Array.from(users.keys()));
 
   socket.on("disconnect", () => {
+    const set = users.get(userId);
+
+    if (set) {
+      set.delete(socket.id);
+
+      // if no more tabs open → remove user
+      if (set.size === 0) {
+        users.delete(userId);
+      }
+    }
+
+    io.emit("getonline", Array.from(users.keys()));
+
     console.log("Client disconnected:", socket.id);
   });
 });
@@ -24,5 +53,4 @@ const PORT = process.env.PORT || 9001;
 
 server.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
-  console.log(`Press CTRL + C to stop the server`);
 });

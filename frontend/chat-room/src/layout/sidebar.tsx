@@ -1,3 +1,4 @@
+import { useSocketContext } from "../context/socketContext";
 import useConversation from "../context/useConversation";
 
 type UserType = {
@@ -18,7 +19,8 @@ type SidebarProps = {
 const Sidebar = ({ users }: SidebarProps) => {
   const { selectedConversation, setSelectedConversation }: any =
     useConversation();
-  // console.log(users);
+
+  const { onlineUsers }: any = useSocketContext();
 
   return (
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">
@@ -30,6 +32,13 @@ const Sidebar = ({ users }: SidebarProps) => {
         {users.map((user) => {
           const isSelected = selectedConversation?._id === user._id;
 
+          const isOnline = onlineUsers?.includes(String(user._id));
+          console.log({
+            user: user._id,
+            onlineUsers,
+            isOnline,
+          });
+
           return (
             <div
               key={user._id}
@@ -39,14 +48,24 @@ const Sidebar = ({ users }: SidebarProps) => {
               }`}
             >
               <div className="flex items-center gap-3">
-                <div>
-                  <div className="avatar avatar-online size-15">
-                    <div className="w-24 rounded-full">
-                      <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
-                    </div>
+                {/* AVATAR */}
+                <div
+                  className={`avatar size-15 ${
+                    isOnline ? "avatar-online" : ""
+                  }`}
+                >
+                  <div className="w-24 rounded-full">
+                    <img
+                      src={
+                        user.image?.secureUrl ||
+                        "https://img.daisyui.com/images/profile/demo/spiderperson@192.webp"
+                      }
+                      alt={user.name}
+                    />
                   </div>
                 </div>
 
+                {/* USER INFO */}
                 <div>
                   <h2 className="font-semibold text-sm">{user.name}</h2>
 
