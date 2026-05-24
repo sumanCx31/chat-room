@@ -29,6 +29,7 @@ export interface ILoggedInUserProfile {
   };
   username:string;
   name: string;
+  gender:string;
   phone: string;
   status: string;
   _id: string;

@@ -4,36 +4,55 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Mail, MessageSquare, ArrowRight, Loader2 } from "lucide-react";
 import authSvc from "../services/Auth.service";
 import { useNavigate } from "react-router";
+import { useAuth } from "../context/auth.context";
 
 export default function ChatLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setLoggedInUserProfile } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // FIX: send correct payload
-      const res:any = await authSvc.postRequest("/auth/login", {
-        email,
-        password,
-      });
+   
+      const res: any = await authSvc.postRequest("/auth/login", {
+    email,
+    password,
+  });
 
-      // assuming backend returns token + user
-      if (res?.token) {
-        localStorage.setItem("token", res.token);
-      }
+  const token = res?.data?.accessToken;
+  const userId = res?.data?.userId;
+  const user = res?.data?.user; 
 
-      if(res.data.userId){
-        localStorage.setItem("senderId",res.data.userId);
-      }
+  console.log("token:", token);
+  
+  if (token) {
+    localStorage.setItem("token", token);
+  }
 
-      if (res?.user) {
-        localStorage.setItem("user", JSON.stringify(res.user));
-      }
+  if (userId) {
+    localStorage.setItem("senderId", userId);
+  }
+
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  }
+  if (!token) {
+    throw new Error("No token received from backend");
+  }
+
+  const userRes = await authSvc.getRequest("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+     
+      setLoggedInUserProfile(userRes.data);
+
 
       console.log("Login success:", res);
       navigate("/chat");

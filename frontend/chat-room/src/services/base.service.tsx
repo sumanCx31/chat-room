@@ -4,30 +4,33 @@ abstract class HttpService {
   #config: any;
 
   #setHeaders(config: any) {
+    // 1. Initialize headers and merge any custom headers passed to the method
     let headers: any = {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...config.headers 
     };
-    let params: any = {}
+    let params: any = {};
 
-    // content-type, authorization
-    if(config.file || config.files) {
-      headers ={
+    // content-type for file uploads
+    if (config.file || config.files) {
+      headers = {
+        ...headers, // Keep Authorization/other headers intact
         "Content-Type": "multipart/form-data"
-      }
+      };
     }
 
-    // refresh 
-    if(config.refresh) {
+    // refresh token handling
+    if (config.refresh) {
       let token = "";
       headers = {
         ...headers,
-        "Refresh": "Bearer "+token
-      }
+        "Refresh": "Bearer " + token
+      };
     }
 
-    // query string
-    if(config.params) {
-      params = config.params
+    // query strings
+    if (config.params) {
+      params = config.params;
     }
 
     this.#config = {
@@ -35,12 +38,12 @@ abstract class HttpService {
       params: params,
     };
   }
+
   async getRequest(url: string, config: any = {}) {
     try {
       this.#setHeaders(config);
-      let response = await axiosInstance.get(url, this.#config)
-
-      return response
+      let response = await axiosInstance.get(url, this.#config);
+      return response;
     } catch (exception) {
       throw exception;
     }
@@ -49,9 +52,8 @@ abstract class HttpService {
   async postRequest(url: string, data: any = null, config: any = {}) {
     try {
       this.#setHeaders(config);
-      let response = await axiosInstance.post(url, data, this.#config)
-      // console
-      return response
+      let response = await axiosInstance.post(url, data, this.#config);
+      return response;
     } catch (exception) {
       throw exception;
     }
@@ -60,8 +62,8 @@ abstract class HttpService {
   async putRequest(url: string, data: any = null, config: any = {}) {
     try {
       this.#setHeaders(config);
-      let response = await axiosInstance.put(url, data, this.#config)
-      return response
+      let response = await axiosInstance.put(url, data, this.#config);
+      return response;
     } catch (exception) {
       throw exception;
     }
@@ -88,4 +90,4 @@ abstract class HttpService {
   }
 }
 
-export default HttpService
+export default HttpService;
