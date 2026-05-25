@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Sidebar from "../layout/sidebar";
 import "./../assets/style/index.css";
 import Message from "./message";
 import useGetMessage from "../context/useGetMessage.ts";
 import useConversation from "../context/useConversation.ts";
 import authSvc from "../services/Auth.service";
-import { useAuth } from "../context/auth.context.tsx";
+import useGetSocketMessage from "../context/useGetSocketMessage.tsx";
 
 type UserType = {
   _id: string;
@@ -21,9 +21,6 @@ type UserType = {
 const Chat = () => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [message, setMessage] = useState("");
-  const {loggedInUser} = useAuth();
-  console.log("sumanhere:",loggedInUser);
-  
 
   const {
     selectedConversation,
@@ -34,7 +31,13 @@ const Chat = () => {
   const { loading } = useGetMessage();
 
   const senderId = localStorage.getItem("senderId");
+  const token = localStorage.getItem("token");
 
+  // AUTO SCROLL REF
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
+  useGetSocketMessage();
+
+  // FETCH USERS
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -42,7 +45,12 @@ const Chat = () => {
   const fetchUsers = async () => {
     try {
       const res = await fetch(
-        "http://localhost:9001/api/v1/auth/users"
+        "http://localhost:9001/api/v1/auth/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const data = await res.json();
@@ -53,6 +61,13 @@ const Chat = () => {
     }
   };
 
+  // AUTO SCROLL TO LAST MESSAGE
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   // SEND MESSAGE
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -61,7 +76,7 @@ const Chat = () => {
       const response = await authSvc.postRequest(
         `/message/send`,
         {
-          receiverId:selectedConversation._id,
+          receiverId: selectedConversation._id,
           senderId,
           message,
         }
@@ -124,6 +139,9 @@ const Chat = () => {
                   />
                 ))
               )}
+
+              {/* AUTO SCROLL TARGET */}
+              <div ref={messageEndRef}></div>
 
             </div>
 

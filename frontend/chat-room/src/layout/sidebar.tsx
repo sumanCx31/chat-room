@@ -20,7 +20,9 @@ const Sidebar = ({ users }: SidebarProps) => {
   const { selectedConversation, setSelectedConversation }: any =
     useConversation();
 
-  const { onlineUsers }: any = useSocketContext();
+  const { socket, onlineUsers }= useSocketContext();
+  console.log("online:",onlineUsers);
+  
 
   return (
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">
@@ -33,6 +35,7 @@ const Sidebar = ({ users }: SidebarProps) => {
           const isSelected = selectedConversation?._id === user._id;
 
           const isOnline = onlineUsers?.includes(String(user._id));
+          // const isOnline = true;
           console.log({
             user: user._id,
             onlineUsers,

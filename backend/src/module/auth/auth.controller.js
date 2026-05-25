@@ -199,25 +199,25 @@ class AuthController {
     }
   }
 
-  getAllUsers = async(req,res)=>{
-    try {
-      const getUsers = await UserModel.find();
-      if(!getUsers){
-        throw({
-          code:404,
-          message:"Users not found!!",
-          status:"NOT_FOUND"
-        })
-      }
-      res.json({
-        data:getUsers,
-        message:"Users fetched successfully!!",
-        status:"SUCCESS"
-      })
-    } catch (exception) {
-      throw exception;
-    }
+getAllUsers = async (req, res) => {
+  try {
+    const user = req.loggedInUser;
+
+    // exclude logged in user
+    const getUsers = await UserModel.find({
+      _id: { $ne: user._id },
+    });
+
+    res.json({
+      data: getUsers,
+      message: "Users fetched successfully!!",
+      status: "SUCCESS",
+    });
+
+  } catch (exception) {
+    throw exception;
   }
+};
 
   loggedInUserProfile = (req, res, next) => {
     res.json({

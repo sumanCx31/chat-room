@@ -9,7 +9,7 @@ authRouter.post("/register", uploader().single("image"), bodyValidator(UserRegis
 authRouter.post("/activate",authCltr.activateAccount);
 authRouter.post("/login",authCltr.login);
 authRouter.post("/change-password",authCltr.changePassword);
-authRouter.get("/users",authCltr.getAllUsers);
+authRouter.get("/users",auth(),authCltr.getAllUsers);
 authRouter.get("/me",auth(), authCltr.loggedInUserProfile)
 
 module.exports = authRouter;

@@ -1,5 +1,5 @@
+// const {getReceiverSocketId,io}  = require("../../../../index.js");
 const chatModel = require("../model/chat.js");
-const Chat = require("../model/chat.js");
 const Message = require("../model/message.js");
 
 class ChatController {
@@ -40,6 +40,11 @@ class ChatController {
       conversation.message.push(newMessage._id);
 
       await Promise.all([conversation.save(), newMessage.save()]);
+      // const receiversocketId = getReceiverSocketId(receiverId);
+      // if(receiversocketId){
+      //  io.to(receiversocketId).emit("newMessage",newMessage);
+      // }
+
 
       res.status(201).json({
         status: "SUCCESS",

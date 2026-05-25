@@ -11,7 +11,11 @@ const io = new Server(server, {
   },
 });
 
-// userId -> Set(socketIds) (supports multiple tabs)
+
+const getReceiverSocketId = (receiverId)=>{
+  return users[receiverId];
+}
+
 const users = new Map();
 
 io.on("connection", (socket) => {
@@ -21,14 +25,11 @@ io.on("connection", (socket) => {
 
   if (!userId) return;
 
-  // init set
   if (!users.has(userId)) {
     users.set(userId, new Set());
   }
 
   users.get(userId).add(socket.id);
-
-  // emit online users
   io.emit("getonline", Array.from(users.keys()));
 
   socket.on("disconnect", () => {
@@ -37,7 +38,6 @@ io.on("connection", (socket) => {
     if (set) {
       set.delete(socket.id);
 
-      // if no more tabs open → remove user
       if (set.size === 0) {
         users.delete(userId);
       }
@@ -54,3 +54,7 @@ const PORT = process.env.PORT || 9001;
 server.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
 });
+
+
+
+module.exports ={ getReceiverSocketId,io };
