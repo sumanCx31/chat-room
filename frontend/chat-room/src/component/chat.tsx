@@ -1,11 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+// chat.tsx
+
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import Sidebar from "../layout/sidebar";
 import "./../assets/style/index.css";
 import Message from "./message";
-import useGetMessage from "../context/useGetMessage.ts";
-import useConversation from "../context/useConversation.ts";
+
+import useGetMessage from "../context/useGetMessage";
+import useConversation from "../context/useConversation";
+
 import authSvc from "../services/Auth.service";
-import useGetSocketMessage from "../context/useGetSocketMessage.tsx";
+
+import useGetSocketMessage from "../context/useGetSocketMessage";
 
 type UserType = {
   _id: string;
@@ -19,8 +29,12 @@ type UserType = {
 };
 
 const Chat = () => {
-  const [users, setUsers] = useState<UserType[]>([]);
-  const [message, setMessage] = useState("");
+  const [users, setUsers] = useState<
+    UserType[]
+  >([]);
+
+  const [message, setMessage] =
+    useState("");
 
   const {
     selectedConversation,
@@ -30,12 +44,20 @@ const Chat = () => {
 
   const { loading } = useGetMessage();
 
-  const senderId = localStorage.getItem("senderId");
-  const token = localStorage.getItem("token");
+  // SOCKET MESSAGE LISTENER
+  useGetSocketMessage();
+
+  const senderId =
+    localStorage.getItem("senderId");
+
+  const token =
+    localStorage.getItem("token");
 
   // AUTO SCROLL REF
-  const messageEndRef = useRef<HTMLDivElement | null>(null);
-  useGetSocketMessage();
+  const messageEndRef =
+    useRef<HTMLDivElement | null>(
+      null
+    );
 
   // FETCH USERS
   useEffect(() => {
@@ -61,37 +83,54 @@ const Chat = () => {
     }
   };
 
-  // AUTO SCROLL TO LAST MESSAGE
+  // AUTO SCROLL
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
+    messageEndRef.current?.scrollIntoView(
+      {
+        behavior: "smooth",
+      }
+    );
   }, [messages]);
 
   // SEND MESSAGE
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
+  const handleSendMessage =
+    async () => {
+      if (
+        !message.trim() ||
+        !selectedConversation
+      )
+        return;
 
-    try {
-      const response = await authSvc.postRequest(
-        `/message/send`,
-        {
-          receiverId: selectedConversation._id,
-          senderId,
-          message,
-        }
-      );
+      try {
+        const response =
+          await authSvc.postRequest(
+            `/message/send`,
+            {
+              receiverId:
+                selectedConversation._id,
+              senderId,
+              message,
+            }
+          );
 
-      const newMessage =
-        response?.data?.data || response?.data;
+        const newMessage =
+          response?.data?.data ||
+          response?.data;
 
-      setMessages([...messages, newMessage]);
+        // UPDATE OWN UI
+        setMessages((prev: any) => [
+          ...prev,
+          newMessage,
+        ]);
 
-      setMessage("");
-    } catch (error) {
-      console.log("Send Message Error:", error);
-    }
-  };
+        setMessage("");
+      } catch (error) {
+        console.log(
+          "Send Message Error:",
+          error
+        );
+      }
+    };
 
   return (
     <div className="h-screen flex bg-slate-950 text-white overflow-hidden">
@@ -108,11 +147,15 @@ const Chat = () => {
           {selectedConversation ? (
             <div>
               <h2 className="font-semibold text-lg">
-                {selectedConversation.name}
+                {
+                  selectedConversation.name
+                }
               </h2>
 
               <p className="text-xs text-slate-400">
-                {selectedConversation.email}
+                {
+                  selectedConversation.email
+                }
               </p>
             </div>
           ) : (
@@ -131,17 +174,27 @@ const Chat = () => {
 
               {loading ? (
                 <p>Loading...</p>
+              ) : Array.isArray(
+                  messages
+                ) ? (
+                messages.map(
+                  (msg: any) => (
+                    <Message
+                      key={msg._id}
+                      message={msg}
+                    />
+                  )
+                )
               ) : (
-                messages?.map((msg: any) => (
-                  <Message
-                    key={msg._id}
-                    message={msg}
-                  />
-                ))
+                <p>
+                  No messages
+                </p>
               )}
 
               {/* AUTO SCROLL TARGET */}
-              <div ref={messageEndRef}></div>
+              <div
+                ref={messageEndRef}
+              ></div>
 
             </div>
 
@@ -154,7 +207,9 @@ const Chat = () => {
                   type="text"
                   value={message}
                   onChange={(e) =>
-                    setMessage(e.target.value)
+                    setMessage(
+                      e.target.value
+                    )
                   }
                   onKeyDown={(e) =>
                     e.key === "Enter" &&
@@ -165,7 +220,9 @@ const Chat = () => {
                 />
 
                 <button
-                  onClick={handleSendMessage}
+                  onClick={
+                    handleSendMessage
+                  }
                   className="btn btn-primary"
                 >
                   Send
@@ -185,7 +242,8 @@ const Chat = () => {
               </h1>
 
               <p className="text-slate-500 mt-2">
-                Select a user from sidebar
+                Select a user from
+                sidebar
               </p>
 
             </div>

@@ -1,29 +1,21 @@
-// const {getReceiverSocketId,io}  = require("../../../../index.js");
 const chatModel = require("../model/chat.js");
 const Message = require("../model/message.js");
 
+const {
+  getReceiverSocketId,
+  getIO,
+} = require("../../../../socket");
+
 class ChatController {
-  // Send message
-  sendMessage = async (req, res) => {
+
+   sendMessage = async (req, res) => {
     try {
-      const { message, senderId,receiverId } = req.body;
-
-
-
-      console.log(message,senderId,receiverId);
-      
-
-      if (!message || !senderId || !receiverId) {
-        return res.status(400).json({
-          message: "All fields are required",
-        });
-      }
+      const { message, senderId, receiverId } = req.body;
 
       let conversation = await chatModel.findOne({
         participants: { $all: [senderId, receiverId] },
       });
 
-      // CREATE CHAT IF NOT EXISTS
       if (!conversation) {
         conversation = await chatModel.create({
           participants: [senderId, receiverId],
@@ -31,71 +23,55 @@ class ChatController {
         });
       }
 
-      const newMessage = new Message({
+      const newMessage = await Message.create({
         senderId,
         receiverId,
         message,
       });
 
       conversation.message.push(newMessage._id);
+      await conversation.save();
 
-      await Promise.all([conversation.save(), newMessage.save()]);
-      // const receiversocketId = getReceiverSocketId(receiverId);
-      // if(receiversocketId){
-      //  io.to(receiversocketId).emit("newMessage",newMessage);
-      // }
+      // ✅ REALTIME EMIT
+      const socketId = getReceiverSocketId(receiverId);
+      const io = getIO();
 
+      if (socketId && io) {
+        io.to(socketId).emit("newMessage", newMessage);
+      }
 
-      res.status(201).json({
+      return res.json({
         status: "SUCCESS",
-        message: "Message sent successfully",
         data: newMessage,
       });
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({
-        message: error.message,
-      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ message: err.message });
     }
   };
 
-  // Get messages of a chat
   getMessages = async (req, res) => {
     try {
-      const receiverId = req.params;
-
-     const { senderId } = req.query;
-
-      console.log(receiverId,senderId);
-      
+      const receiverId = req.params._id;
+      const { senderId } = req.query;
 
       const conversation = await chatModel
         .findOne({
-          participants: {
-            $all: [senderId, receiverId],
-          },
+          participants: { $all: [senderId, receiverId] },
         })
         .populate("message");
 
-      if (!conversation) {
-        return res.json({
-          status: 203,
-          data: [],
-        });
-      }
-
-      res.json({
+      return res.json({
         status: 200,
-        data: conversation.message,
+        data: conversation?.message || [],
       });
-    } catch (error) {
-      res.status(500).json({
-        message: error.message,
+
+    } catch (err) {
+      return res.status(500).json({
+        message: err.message,
       });
     }
   };
 }
 
-const chatCltr = new ChatController();
-module.exports = chatCltr;
+module.exports = new ChatController();

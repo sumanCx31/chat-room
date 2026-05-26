@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 
-let io;
 const users = new Map();
+let io;
 
 const initSocket = (server) => {
   io = new Server(server, {
@@ -12,26 +12,19 @@ const initSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    const userId = socket.handshake.query.userId;
-    console.log("New Client Connected:", socket.id, "User:", userId);
+    const userId = socket.handshake.auth?.userId;
 
     if (!userId) return;
 
-    if (!users.has(userId)) {
-      users.set(userId, new Set());
-    }
+    users.set(userId, socket.id);
 
-    users.get(userId).add(socket.id);
+    console.log("CONNECTED:", userId, socket.id);
 
     io.emit("getonline", Array.from(users.keys()));
-    console.log("Client disconnected:", socket.id);
 
     socket.on("disconnect", () => {
-      const set = users.get(userId);
-
-      if (set) {
-        set.delete(socket.id);
-        if (set.size === 0) users.delete(userId);
+      if (users.get(userId) === socket.id) {
+        users.delete(userId);
       }
 
       io.emit("getonline", Array.from(users.keys()));

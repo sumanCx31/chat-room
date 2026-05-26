@@ -1,27 +1,36 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useConversation from "./useConversation";
 import { useSocketContext } from "./socketContext";
-import sound from "../assets/notification.mp3"
 
 function useGetSocketMessage() {
-  const { socket } = useSocketContext();
-  const { messages, setMessages }:any = useConversation();
+  const { socket }:any = useSocketContext();
+  const { setMessages, selectedConversation }:any = useConversation();
+
+  const selectedRef = useRef(selectedConversation);
+
+  useEffect(() => {
+    selectedRef.current = selectedConversation;
+  }, [selectedConversation]);
 
   useEffect(() => {
     if (!socket) return;
 
-    const handler = (newMessage: any) => {
-      setMessages([...messages, newMessage]);
+    const handler = (msg: any) => {
+      const active = selectedRef.current;
+      if (!active) return;
+
+      if (
+        msg.senderId === active._id ||
+        msg.receiverId === active._id
+      ) {
+        setMessages((prev: any) => [...prev, msg]);
+      }
     };
 
     socket.on("newMessage", handler);
-    const notification = new Audio(sound);
-    notification.play();
 
-    return () => {
-      socket.off("newMessage", handler);
-    };
-  }, [socket, messages, setMessages]);
+    return () => socket.off("newMessage", handler);
+  }, [socket, setMessages]);
 }
 
 export default useGetSocketMessage;

@@ -1,60 +1,38 @@
-import {
-  createContext,
-  useEffect,
-  useState,
-  useContext,
-} from "react";
-import io, { Socket } from "socket.io-client";
+import { createContext, useContext, useEffect, useState } from "react";
+import io from "socket.io-client";
 import { useAuth } from "./auth.context";
 
-type SocketContextType = {
-  socket: Socket | null;
+interface SocketContextType {
+  socket: any;
   onlineUsers: string[];
-};
+}
 
-const SocketContext = createContext<SocketContextType>({
-  socket: null,
-  onlineUsers: [],
-});
+const SocketContext = createContext<SocketContextType | null>(null);
 
-type Props = {
-  children: any;
-};
-
-export const SocketProvider = ({ children }: Props) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+export const SocketProvider = ({ children }: any) => {
   const { loggedInUser } = useAuth();
+  const [socket, setSocket] = useState<any>(null);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (!loggedInUser?._id) {
-      if (socket) {
-        socket.disconnect();
-        setSocket(null);
-      }
-      return;
-    }
+useEffect(() => {
+  if (!loggedInUser?._id) return;
 
-    const newSocket = io("http://localhost:9001", {
-      query: {
-        userId: loggedInUser._id,
-      },
-    });
+  const newSocket = io("http://localhost:9001", {
+    auth: {
+      userId: loggedInUser._id,
+    },
+  });
 
-    setSocket(newSocket);
+  setSocket(newSocket);
 
-    newSocket.on("getonline", (users: string[]) => {
-      setOnlineUsers(users);
-    });
+  newSocket.on("getonline", (users: string[]) => {
+    setOnlineUsers(users);
+  });
 
-    newSocket.on("disconnect", () => {
-      console.log("Socket disconnected");
-    });
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [loggedInUser]);
+  return () => {
+    newSocket.disconnect(); // ✅ no return value
+  };
+}, [loggedInUser?._id]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>
