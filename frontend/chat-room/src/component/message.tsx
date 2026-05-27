@@ -26,6 +26,7 @@ function Message({ message }: MessageProps) {
         }`}
       >
         {message.message}
+        {/* <p className="font-extralight">{message.createdAt}</p> */}
       </div>
     </div>
   );

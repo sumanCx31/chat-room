@@ -1,3 +1,4 @@
+import { useAuth } from "../context/auth.context";
 import { useSocketContext } from "../context/socketContext";
 import useConversation from "../context/useConversation";
 
@@ -20,9 +21,9 @@ const Sidebar = ({ users }: SidebarProps) => {
   const { selectedConversation, setSelectedConversation }: any =
     useConversation();
 
-  const { socket, onlineUsers }= useSocketContext();
+  const { socket, onlineUsers }:any= useSocketContext();
   console.log("online:",onlineUsers);
-  
+  const {loggedInUser} = useAuth();
 
   return (
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">

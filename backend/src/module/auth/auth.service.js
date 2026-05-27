@@ -14,8 +14,12 @@ class AuthService {
       }
     data.password = bcrypt.hashSync(data.password, 12);
     delete data.confirmPassword;
-    data.status = Status.INACTIVE;
-    data.activationToken = randomNumberGenerator(6);
+    // data.status = Status.INACTIVE;
+    // data.activationToken = randomNumberGenerator(6);
+
+    // ----->  No needed to activate user  <-------
+    data.status = Status.ACTIVE;
+    data.activationToken = null;
     return data;
   } catch (exception) {
     throw exception;

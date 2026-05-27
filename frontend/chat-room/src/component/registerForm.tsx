@@ -1,8 +1,9 @@
 import "./../assets/style/index.css";
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Camera, Loader2, MessageSquare } from "lucide-react";
+import {  Camera, Loader2, MessageSquare } from "lucide-react";
 import authSvc from "../services/Auth.service";
+import { useNavigate } from "react-router";
 
 export default function ChatRegister() {
   const [form, setForm] = useState({
@@ -19,7 +20,7 @@ export default function ChatRegister() {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (
@@ -76,6 +77,7 @@ export default function ChatRegister() {
       const res = await authSvc.postRequest("/auth/register", formData);
 
       console.log(res);
+      navigate("/");
     } catch (error) {
       console.log(error);
     } finally {
@@ -89,15 +91,15 @@ export default function ChatRegister() {
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-slate-950 font-sans antialiased py-12 px-4">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[40%] -right-[20%] h-[80%] w-[60%] rounded-full bg-indigo-600/10 blur-[120px]" />
-        <div className="absolute -bottom-[40%] -left-[20%] h-[80%] w-[60%] rounded-full bg-violet-600/10 blur-[120px]" />
+        <div className="absolute top-[-40%] right-[-20%] h-[80%] w-[60%] rounded-full bg-indigo-600/10 blur-[120px]" />
+        <div className="absolute bottom-[-40%] left-[-20%] h-[80%] w-[60%] rounded-full bg-violet-600/10 blur-[120px]" />
       </div>
 
       <motion.div className="relative z-10 w-full max-w-lg">
         <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-8 backdrop-blur-xl">
 
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-linear-to-tr from-indigo-500 to-violet-500">
               <MessageSquare className="h-5 w-5 text-white" />
             </div>
 
@@ -147,7 +149,7 @@ export default function ChatRegister() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 py-2.5 text-white font-semibold"
+              className="w-full rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 py-2.5 text-white font-semibold"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
