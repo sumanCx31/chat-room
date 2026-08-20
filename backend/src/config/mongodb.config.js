@@ -8,7 +8,7 @@ const { DbConfig } = require("./config");
             autoCreate: true,
             autoIndex: true,
         })
-        console.log("Mongodb Connected Successfully.");
+        console.log("Mongodb Connected Successfully.", { dbName: DbConfig.mongoDBName });
     } catch (exception) {
         console.log("Error connecting to MongoDB", exception);
         process.exit(1);

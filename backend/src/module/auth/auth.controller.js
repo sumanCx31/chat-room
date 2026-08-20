@@ -17,7 +17,7 @@ class AuthController {
       const transformedData = await authSvc.transformedData(req,data);
 
       const user = await userSvc.createUser(transformedData);
-      await authSvc.sendActivationNotification(user);
+      // await authSvc.sendActivationNotification(user);
       console.log(user);
 
       res.json({

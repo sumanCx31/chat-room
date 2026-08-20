@@ -1,13 +1,13 @@
-const { SMTPConfig } = require("../config/config");
+// const { Resend } = require("resend");
 const { Resend } = require("resend");
-
+const { SMTPConfig } = require("../config/config");
 
 class EmailService {
   #resend;
+
   constructor() {
-    
     try {
-      const apiKey = process.env.RESEND_API_KEY || SMTPConfig.resendApiKey;
+      const apiKey = process.env.RESEND_API_KEY || SMTPConfig.resendApiKey ;
 
       this.#resend = new Resend(apiKey);
       console.log("Resend Email Service initialized...");
