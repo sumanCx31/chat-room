@@ -17,7 +17,7 @@ export const SocketProvider = ({ children }: any) => {
 useEffect(() => {
   if (!loggedInUser?._id) return;
 
-  const newSocket = io("http://localhost:9001", {
+  const newSocket = io("https://chatroom-k0te.onrender.com", {
     auth: {
       userId: loggedInUser._id,
     },

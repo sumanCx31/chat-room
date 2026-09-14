@@ -67,7 +67,7 @@ const Chat = () => {
   const fetchUsers = async () => {
     try {
       const res = await fetch(
-        "http://localhost:9001/api/v1/auth/users",
+        "https://chatroom-k0te.onrender.com/api/v1/auth/users",
         {
           headers: {
             Authorization: `Bearer ${token}`,
