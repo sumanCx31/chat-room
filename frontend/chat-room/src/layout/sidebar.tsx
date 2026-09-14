@@ -21,7 +21,7 @@ const Sidebar = ({ users }: SidebarProps) => {
   const { selectedConversation, setSelectedConversation }: any =
     useConversation();
 
-  const { socket, onlineUsers }:any= useSocketContext();
+  const { onlineUsers }:any= useSocketContext();
   console.log("online:",onlineUsers);
   const {loggedInUser} = useAuth();
 
@@ -29,6 +29,12 @@ const Sidebar = ({ users }: SidebarProps) => {
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">
       <div className="h-16 border-b border-slate-800 flex items-center px-6">
         <h1 className="text-xl font-bold">Chats</h1>
+        <p className="text-xs text-slate-400 ml-2">
+          {onlineUsers.length} online
+        </p>
+         <p className="text-xs text-slate-400 ml-2">
+          {loggedInUser?.name} online
+        </p>
       </div>
 
       <div className="flex-1 overflow-y-auto">

@@ -17,7 +17,7 @@ export default function ChatRegister() {
     image:null
   });
 
-  const [image, setImage] = useState<File | null>(null);
+  // const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function ChatRegister() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setImage(file);
+    // setImage(file);
 
     const reader = new FileReader();
     reader.onloadend = () => {
